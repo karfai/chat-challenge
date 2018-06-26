@@ -29,10 +29,10 @@ module CoinhouseChat
     config.generators.system_tests = nil
 
     config.generators do |gen|
-      g.stylesheets false
-      g.javascripts false
-      g.helper false
-      g.channel assets: false
+      gen.stylesheets false
+      gen.javascripts false
+      gen.helper false
+      gen.channel assets: false
     end
   end
 end
