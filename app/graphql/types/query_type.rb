@@ -4,6 +4,6 @@ class Types::QueryType < Types::BaseObject
   end
 
   def messages
-    
+    Message.all
   end
 end

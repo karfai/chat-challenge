@@ -4,6 +4,12 @@ import { Container, Grid } from 'semantic-ui-react';
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
+const Message = (props) => {
+  return (
+      <div>{ props.message.sender }: { props.message.content }</div>
+  );
+};
+
 export default class Messages extends React.Component {
   constructor(props) {
     super(props);
@@ -11,11 +17,12 @@ export default class Messages extends React.Component {
   }
 
   render_messages(o) {
-    debugger;
-    let rv = _.map(this.state.messages, (m) => {
+    let rv = _.map(o.messages, (m) => {
       return (
         <Grid.Row>
-          <Grid.Column>{ m.text }</Grid.Column>
+          <Grid.Column>
+            <Message message={ m } />
+          </Grid.Column>
         </Grid.Row>
       );              
     });
@@ -34,6 +41,9 @@ export default class Messages extends React.Component {
         }`
       }>
       {({ loading, error, data }) => {
+        if (loading) return (<p>Loading...</p>);
+        if (error) return (<p>Error: { error }</p>);
+        
         return (
           <Grid>
             { this.render_messages(data) }
