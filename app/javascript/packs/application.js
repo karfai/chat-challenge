@@ -16,7 +16,6 @@ import { Grid } from 'semantic-ui-react';
 import Identity from '../components/identity';
 import Messages from '../components/messages';
 import Send from '../components/send';
-import MessagesModel from '../models/messages_model';
 
 const cable = ActionCable.createConsumer();
 
