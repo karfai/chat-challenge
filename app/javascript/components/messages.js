@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import React from 'react';
 import { Container, Grid } from 'semantic-ui-react';
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 
 export default class Messages extends React.Component {
   constructor(props) {
@@ -23,9 +25,21 @@ export default class Messages extends React.Component {
   render() {
     let messages = this.render_messages();
     return (
-        <Grid>
-        { messages }
-        </Grid>
+      <Query query={gql`
+        {
+          messages {
+            sender
+            content
+          }
+        }`
+      }>
+      {({ loading, error, data }) => {
+        return (
+          <Grid>
+          </Grid>
+        );
+      }}
+      </Query>
     );
   }
 }
