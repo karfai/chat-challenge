@@ -10,7 +10,8 @@ export default class Messages extends React.Component {
     this.state = { messages: [{ text: '12344' }] };
   }
 
-  render_messages() {
+  render_messages(o) {
+    debugger;
     let rv = _.map(this.state.messages, (m) => {
       return (
         <Grid.Row>
@@ -23,7 +24,6 @@ export default class Messages extends React.Component {
   }
   
   render() {
-    let messages = this.render_messages();
     return (
       <Query query={gql`
         {
@@ -36,6 +36,7 @@ export default class Messages extends React.Component {
       {({ loading, error, data }) => {
         return (
           <Grid>
+            { this.render_messages(data) }
           </Grid>
         );
       }}
