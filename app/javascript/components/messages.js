@@ -17,9 +17,9 @@ export default class Messages extends React.Component {
   }
 
   render_messages(o) {
-    let rv = _.map(o.messages, (m) => {
+    let rv = _.map(o.messages, (m, i) => {
       return (
-        <Grid.Row>
+        <Grid.Row key={ i }>
           <Grid.Column>
             <Message message={ m } />
           </Grid.Column>
