@@ -10,47 +10,70 @@ const Message = (props) => {
   );
 };
 
-export default class Messages extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { messages: [{ text: '12344' }] };
+const Q = gql`{
+  messages {
+    sender
+    content
   }
+}`;
 
-  render_messages(o) {
-    let rv = _.map(o.messages, (m, i) => {
+const SUB = gql`
+subscription {
+  messageAdded {
+    sender
+    content
+  }
+}
+`;
+
+class Messages extends React.Component {
+  componentDidMount() {
+    this.props.subscribeToNewMessages();
+  }
+  
+  render_messages(ms) {
+    return _.map(ms, (m, i) => {
       return (
-        <Grid.Row key={ i }>
-          <Grid.Column>
-            <Message message={ m } />
-          </Grid.Column>
+        <Grid.Row key={i}>
+          <Grid.Column><Message message={ m } /></Grid.Column>  
         </Grid.Row>
-      );              
+      );
     });
-
-    return rv;
   }
   
   render() {
+    if (this.props.loading) return (<div>Loading...</div>);
+    if (this.props.error) return (<div>Error: { this.props.error }</div>);
+
     return (
-      <Query query={gql`
-        {
-          messages {
-            sender
-            content
-          }
-        }`
-      }>
-      {({ loading, error, data }) => {
-        if (loading) return (<p>Loading...</p>);
-        if (error) return (<p>Error: { error }</p>);
-        
-        return (
-          <Grid>
-            { this.render_messages(data) }
-          </Grid>
-        );
-      }}
-      </Query>
+      <Grid>
+        { this.render_messages(_.get(this.props.data, "messages", [])) }
+      </Grid>
     );
   }
 }
+
+//    { res => <Messages {...res} /> }
+
+const MessagesWithData = () => (
+  <Query query={ Q }>
+    {({ subscribeToMore, ...res }) => (
+      <Messages
+        {...res}
+        subscribeToNewMessages={() =>
+          subscribeToMore({
+            document: SUB,
+            variables: {},
+            updateQuery: (prev, { subscriptionData }) => {
+              if (!subscriptionData.data) return prev;
+              const nm = subscriptionData.data.messageAdded;
+              return _.assignIn({}, prev, {});
+            }
+          })
+        }
+      />                          
+    )}
+  </Query>
+);
+
+export default MessagesWithData;

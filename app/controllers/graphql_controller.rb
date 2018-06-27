@@ -11,6 +11,9 @@ class GraphqlController < ApplicationController
       # current_user: current_user,
     }
     result = CoinhouseChatSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+    if result.subscription?
+      response.headers["X-Subscription-ID"] = result.context[:subscription_id]
+    end
     render json: result
   end
 

@@ -8,7 +8,11 @@ class Mutations::CreateMessage < GraphQL::Schema::Mutation
 
   def resolve(sender:, content:)
     m = Message.create(sender: sender, content: content)
-    CoinhouseChatSchema.subscriptions.trigger('messageAdded', {}, m)
+    if CoinhouseChatSchema.subscriptions
+      CoinhouseChatSchema.subscriptions.trigger('messageAdded', {}, m)
+    else
+      Rails.logger.warn('no subscriptions')
+    end
     m
   end
 end

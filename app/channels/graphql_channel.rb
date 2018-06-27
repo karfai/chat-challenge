@@ -3,30 +3,24 @@ class GraphqlChannel < ApplicationCable::Channel
     @subscription_ids = []
   end
 
-  # @param [Object] data
-  # @return [Object]
   def execute(data)
-    Rails.logger.info("GraphqlChannel#execute: #{data.inspect}")
-
-    query = data['query']
-    variables = ensure_hash(data['variables'])
-    operation_name = data['operationName']
+    query = data["query"]
+    variables = ensure_hash(data["variables"])
+    operation_name = data["operationName"]
     context = {
-      # current_user: current_user,
-      # Make sure the channel is in the context
-      channel: self
+      channel: self,
     }
 
-    result = CoinhouseChatSchema.execute(
+    result = CoinhouseChatSchema.execute({
       query: query,
       context: context,
       variables: variables,
       operation_name: operation_name
-    )
+    })
 
     payload = {
       result: result.subscription? ? {data: nil} : result.to_h,
-      more: result.subscription?
+      more: result.subscription?,
     }
 
     # Track the subscription here so we can remove it

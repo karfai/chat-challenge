@@ -1,11 +1,15 @@
 /* eslint no-console:0 */
 import ApolloClient from 'apollo-boost';
 import { HttpLink } from 'apollo-link-http';
+import { ApolloLink } from 'apollo-link';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloProvider } from 'react-apollo';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+
+import ActionCable from 'actioncable';
+import ActionCableLink from 'graphql-ruby-client/subscriptions/ActionCableLink';
 
 import { Grid } from 'semantic-ui-react';
 
@@ -13,6 +17,20 @@ import Identity from '../components/identity';
 import Messages from '../components/messages';
 import Send from '../components/send';
 import MessagesModel from '../models/messages_model';
+
+const cable = ActionCable.createConsumer();
+
+const hasSubscriptionOperation = ({ query: { definitions } }) => {
+  return definitions.some(
+    ({ kind, operation }) => kind === 'OperationDefinition' && operation === 'subscription'
+  );
+};
+
+const link = ApolloLink.split(
+  hasSubscriptionOperation,
+  new ActionCableLink({cable}),
+  new HttpLink()
+);
 
 const client = new ApolloClient({
   link: new HttpLink(),
