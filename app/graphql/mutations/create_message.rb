@@ -7,6 +7,8 @@ class Mutations::CreateMessage < GraphQL::Schema::Mutation
   field :content, String, null: false
 
   def resolve(sender:, content:)
-    Message.create(sender: sender, content: content)
+    m = Message.create(sender: sender, content: content)
+    CoinhouseChatSchema.subscriptions.trigger('messageAdded', {}, m)
+    m
   end
 end
