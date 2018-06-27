@@ -1,29 +1,39 @@
+import gql from "graphql-tag";
+import { Mutation } from "react-apollo";
 import React from 'react';
 import { Button, Form } from 'semantic-ui-react';
+
+const Q = gql`
+  mutation CreateMessage($sender: String!, $content: String!) {
+    createMessage(sender: $sender, content: $content) {
+      content
+    }
+  }
+`;
 
 export default class Send extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { message: '' };
-    this.update = this.update.bind(this);
-    this.send = this.send.bind(this);
-  }
-  
-  update(e) {
-    this.setState({ message: e.target.value });
-  }
-
-  send(e) {
   }
   
   render() {
+    let message;
     return (
-        <Form>
-          <Form.Group>
-            <Form.Input value={ this.state.message } onChange={ this.update } width={8} />
-            <Button type="submit" onClick={ this.send }>Send</Button>
-          </Form.Group>
-        </Form>
+      <Mutation mutation={ Q }>
+        {(createMessage, { data }) => (
+         <Form onSubmit={ e => {
+           e.preventDefault();
+           createMessage({ variables: { sender: 'sender', content: message.value }});
+           message.value = '';
+         }}
+         >
+            <Form.Group>
+              <input ref={ node => { message = node; } } width={8} />
+              <Button type="submit">Send</Button>
+            </Form.Group>
+          </Form>
+        )}
+      </Mutation>
     );
   }
 }
